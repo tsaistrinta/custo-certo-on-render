@@ -1,0 +1,40 @@
+{
+  "name": "custo-certo-on-render",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/tsaistrinta/custo-certo-on-render#readme",
+  "bugs": {
+    "url": "https://github.com/tsaistrinta/custo-certo-on-render/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsaistrinta/custo-certo-on-render.git"
+  },
+  "license": "ISC",
+  "author": "Lucas T. Strinta",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc && node -e \"require('fs').mkdirSync('dist/database',{recursive:true});require('fs').copyFileSync('src/database/schema.sql','dist/database/schema.sql')\"",
+    "start": "node dist/server.js",
+    "seed": "tsx src/database/seed.ts",
+    "postinstall": "npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
