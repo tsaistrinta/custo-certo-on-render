@@ -3,7 +3,7 @@
  * Implementação manual leve — não depende de zod/joi/yup para manter o bundle enxuto.
  */
 
-import { AppError } from '../errors/app-error.js';
+import { AppError } from '../errors/app-errors.js';
 import type {
   IngredienteInput,
   CompraInput,

@@ -9,7 +9,7 @@ import express, { type Express } from 'express';
 import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import routes from './routes/ingredientes/index.js';
+import routes from './routes/index.js';
 import { errorHandler, notFoundHandler } from './middlewares/error-handler.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

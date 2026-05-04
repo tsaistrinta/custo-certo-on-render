@@ -6,7 +6,7 @@
  */
 
 import { ingredienteRepository } from '../repositories/ingrediente.repo.js';
-import { NotFoundError, ConflictError } from '../errors/app-error.js';
+import { NotFoundError, ConflictError } from '../errors/app-errors.js';
 import type {
   Ingrediente,
   IngredienteInput,

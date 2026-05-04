@@ -2,7 +2,7 @@
  * Validação dos payloads vindos da balança (ESP32) e do frontend.
  */
 
-import { AppError } from '../errors/app-error.js';
+import { AppError } from '../errors/app-errors.js';
 
 interface PesoPayload {
   peso: number;

@@ -6,7 +6,7 @@
  */
 
 import type { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
-import { AppError } from '../errors/app-error.js';
+import { AppError } from '../errors/app-errors.js';
 
 export const errorHandler: ErrorRequestHandler = (
   err: unknown,

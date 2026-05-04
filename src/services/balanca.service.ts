@@ -8,7 +8,7 @@
 
 import { pesagemRepository } from '../repositories/pesagem.repo.js';
 import { ingredienteService } from './ingrediente.service.js';
-import { AppError } from '../errors/app-error.js';
+import { AppError } from '../errors/app-errors.js';
 import type {
   BalancaState,
   ConfirmacaoPesagem,
