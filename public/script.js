@@ -20,7 +20,7 @@ document.getElementById('sidebar-logo').src =
 let estoque = [];
 let historico = [];
 let pesoAtual = 0;
-let intervaloPeso = null;
+let sseBalanca = null;   // EventSource SSE (substitui o antigo intervaloPeso)
 let chartComp, chartStatus, chartCMV, chartEvolucao;
 let evolucaoFiltro = 'todos';
 let compraIdAtual = null;
@@ -367,21 +367,27 @@ function setFiltroEvolucao(val, btn) {
 }
 window.setFiltroEvolucao = setFiltroEvolucao;
 
-// ======= BALANÇA =======
+// ======= BALANÇA (SSE) =======
 function iniciarLeituraPeso() {
-  if (intervaloPeso) return;
+  if (sseBalanca) return; // já conectado
 
-  intervaloPeso = setInterval(async () => {
+  sseBalanca = new EventSource('/balanca/stream');
+
+  sseBalanca.onmessage = (event) => {
     try {
-      const data = await api('/balanca/peso');
+      const data = JSON.parse(event.data);
       if (typeof data.peso === 'number') {
         pesoAtual = data.peso;
         atualizarDisplay();
       }
     } catch (err) {
-      console.error('Erro ao buscar peso:', err);
+      console.error('Erro ao parsear evento SSE:', err);
     }
-  }, 500);
+  };
+
+  sseBalanca.onerror = () => {
+    console.warn('SSE balança: conexão interrompida, reconectando…');
+  };
 }
 
 function getIngredienteSelecionado() {

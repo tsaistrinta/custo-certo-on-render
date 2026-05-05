@@ -7,6 +7,7 @@
  */
 
 import { pesagemRepository } from '../repositories/pesagem.repo.js';
+import type { PesoSnapshot } from '../repositories/pesagem.repo.js';
 import { ingredienteService } from './ingrediente.service.js';
 import { AppError } from '../errors/app-errors.js';
 import type {
@@ -17,7 +18,6 @@ import type {
 export const balancaService = {
   /** ESP32 chama com peso medido */
   registrarLeitura(peso: number): void {
-    // Filtra ruído: peso negativo trata como zero
     pesagemRepository.setPeso(Math.max(0, peso));
   },
 
@@ -37,6 +37,14 @@ export const balancaService = {
   /** ESP32 verifica se deve tarar (consome a flag) */
   verificarTara(): boolean {
     return pesagemRepository.consumirTara();
+  },
+
+  /**
+   * Registra callback chamado a cada nova leitura do ESP32.
+   * Retorna função de unsubscribe — chame-a quando a conexão SSE fechar.
+   */
+  addSseListener(fn: (snapshot: PesoSnapshot) => void): () => void {
+    return pesagemRepository.addListener(fn);
   },
 
   /**

@@ -21,13 +21,61 @@ export const balancaController = {
     res.json({ ok: true });
   },
 
-  /** GET /balanca/peso — Frontend faz polling */
+  /** GET /balanca/peso — Frontend faz polling (mantido para compatibilidade) */
   lerPeso(_req: Request, res: Response): void {
     const estado = balancaService.getEstadoAtual();
     res.json({
       peso: estado.pesoAtual,
       online: estado.online,
       ultimaAtualizacao: estado.ultimaAtualizacao,
+    });
+  },
+
+  /**
+   * GET /balanca/stream — SSE: frontend abre uma conexão persistente e
+   * recebe o peso em push sempre que o ESP32 enviar nova leitura.
+   *
+   * Protocolo SSE padrão (text/event-stream):
+   *   data: {"peso":0.123,"online":true,"ultimaAtualizacao":1234567890}\n\n
+   *
+   * O EventSource do browser reconecta automaticamente se cair.
+   */
+  stream(req: Request, res: Response): void {
+    // Cabeçalhos obrigatórios do SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    // Evita que proxies/Render buffer a resposta
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    // Envia o estado atual imediatamente (sem esperar próxima leitura do ESP32)
+    const estadoAtual = balancaService.getEstadoAtual();
+    const snapshotInicial = JSON.stringify({
+      peso: estadoAtual.pesoAtual,
+      online: estadoAtual.online,
+      ultimaAtualizacao: estadoAtual.ultimaAtualizacao,
+    });
+    res.write(`data: ${snapshotInicial}\n\n`);
+
+    // Heartbeat a cada 15s para manter a conexão viva em proxies com timeout
+    const heartbeat = setInterval(() => {
+      try { res.write(': heartbeat\n\n'); } catch { clearInterval(heartbeat); }
+    }, 15_000);
+
+    // Registra listener: cada nova leitura do ESP32 dispara o push
+    const unsubscribe = balancaService.addSseListener((snapshot) => {
+      try {
+        res.write(`data: ${JSON.stringify(snapshot)}\n\n`);
+      } catch {
+        unsubscribe();
+      }
+    });
+
+    // Limpeza ao fechar a aba / navegar para outra página
+    req.on('close', () => {
+      clearInterval(heartbeat);
+      unsubscribe();
     });
   },
 

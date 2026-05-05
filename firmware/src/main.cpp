@@ -21,11 +21,11 @@
 // CONFIGURAÇÕES (sobrescreva via platformio.ini build_flags)
 // =====================================================
 #ifndef WIFI_SSID
-#define WIFI_SSID "TSAI_2.4G"
+#define WIFI_SSID "AndroidAP"
 #endif
 
 #ifndef WIFI_PASS
-#define WIFI_PASS "lucasstrinta"
+#define WIFI_PASS "lucas1234"
 #endif
 
 #ifndef SERVER_URL
@@ -190,7 +190,7 @@ void loop() {
   if (agora - ultimaLeitura >= INTERVALO_LEITURA_MS) {
     ultimaLeitura = agora;
 
-    float peso = scale.get_units(1);
+    float peso = scale.get_units(5);
     if (peso < 0) peso = 0;
 
     char body[64];
@@ -212,5 +212,5 @@ void loop() {
     }
   }
 
-  delay(10);
+  delay(1);
 }
