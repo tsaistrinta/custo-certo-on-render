@@ -4,8 +4,8 @@
 # Este arquivo permite "Infrastructure as Code" no Render.
 # Ao criar um novo Web Service apontando para este repo,
 # o Render lê este arquivo e configura tudo automaticamente.
-#
-# Documentação: https://render.com/docs/blueprint-spec
+## Documentação: https://render.com/docs/blueprint-spec
+
 
 services:
   - type: web
