@@ -15,3 +15,5 @@ router.delete('/:id', ingredientesController.deletar);
 router.post('/:id/compras', ingredientesController.registrarCompra);
 
 export default router;
+
+router.post('/:id/retirada', ingredientesController.retirar);

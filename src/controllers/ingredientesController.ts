@@ -54,4 +54,16 @@ export const ingredientesController = {
     await ingredienteService.deletar(id);
     res.status(204).send();
   },
+
+  /** POST /ingredientes/:id/retirada */
+async retirar(req: Request<{ id: string }>, res: Response): Promise<void> {
+  const id = validateId(req.params.id);
+  const { quantidade } = req.body;
+  if (!quantidade || quantidade <= 0) {
+    res.status(400).json({ erro: 'Quantidade inválida' });
+    return;
+  }
+  const atualizado = await ingredienteService.abaterConsumo(id, quantidade, 'Retirada manual');
+  res.json(atualizado);
+},
 };

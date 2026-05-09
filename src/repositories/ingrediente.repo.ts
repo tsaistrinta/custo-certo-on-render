@@ -116,13 +116,13 @@ export const ingredienteRepository = {
 
     // Registra a entrada inicial no histórico (se qtd > 0)
     if (input.qtd > 0) {
-      await db.execute({
-        sql: `INSERT INTO movimentacoes_estoque
-              (ingrediente_id, tipo, quantidade, preco_unitario, observacao, data)
-              VALUES (?, 'entrada', ?, ?, 'Cadastro inicial', ?)`,
-        args: [id, input.qtd, input.preco, hoje],
-      });
-    }
+  await db.execute({
+    sql: `INSERT INTO movimentacoes_estoque
+          (ingrediente_id, tipo, quantidade, preco_unitario, observacao, data, validade)
+          VALUES (?, 'entrada', ?, ?, 'Cadastro inicial', ?, ?)`,
+    args: [id, input.qtd, input.preco, hoje, input.validade ?? null],
+  });
+}
 
     const criado = await this.buscarPorId(id);
     if (!criado) throw new Error('Falha ao recuperar ingrediente recém-criado');
