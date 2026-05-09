@@ -90,19 +90,18 @@ export async function initSchema(): Promise<void> {
   }
 
   // libSQL aceita executeMultiple para rodar várias instruções de uma vez
-  await db.executeMultiple(schemaSql);
+ await db.executeMultiple(schemaSql);
 
-  initialized = true;
-  console.log('✅ Schema aplicado');
+// Migration: adiciona coluna validade em movimentacoes_estoque (idempotente)
+try {
+  await db.execute(
+    `ALTER TABLE movimentacoes_estoque ADD COLUMN validade TEXT`
+  );
+  console.log('✅ Migration: coluna validade adicionada');
+} catch (e: any) {
+  // Coluna já existe — ignora silenciosamente
+  if (!e.message?.includes('duplicate column')) throw e;
 }
 
-/**
- * Fecha a conexão (útil em testes / shutdown)
- */
-export function closeDb(): void {
-  if (client) {
-    client.close();
-    client = null;
-    initialized = false;
-  }
-}
+initialized = true;
+console.log('✅ Schema aplicado');

@@ -54,12 +54,12 @@ export async function runSeed(): Promise<{ inserted: number }> {
     const ingredienteId = Number(result.lastInsertRowid);
 
     // Registra a "compra inicial" no histórico
-    await db.execute({
-      sql: `INSERT INTO movimentacoes_estoque
-            (ingrediente_id, tipo, quantidade, preco_unitario, observacao, data)
-            VALUES (?, 'entrada', ?, ?, 'Estoque inicial', ?)`,
-      args: [ingredienteId, ing.qtdMax, ing.preco, hoje],
-    });
+   await db.execute({
+  sql: `INSERT INTO movimentacoes_estoque
+        (ingrediente_id, tipo, quantidade, preco_unitario, observacao, data, validade)
+        VALUES (?, 'entrada', ?, ?, 'Estoque inicial', ?, ?)`,
+  args: [ingredienteId, ing.qtdMax, ing.preco, hoje, ing.validade],
+});
 
     inserted++;
   }
