@@ -106,3 +106,10 @@ try {
 initialized = true;
 console.log('✅ Schema aplicado');
 }
+export function closeDb(): void {
+  if (client) {
+    client.close();
+    client = null;
+    initialized = false;
+  }
+}
