@@ -30,43 +30,32 @@ function rowToIngrediente(row: Record<string, unknown>): Ingrediente {
 
 export const ingredienteRepository = {
   /** Lista todos, mais recentes primeiro */
- async listarTodos(): Promise<Ingrediente[]> {
+async listarTodos(): Promise<Ingrediente[]> {
   const db = getDb();
   const { rows } = await db.execute('SELECT * FROM ingredientes ORDER BY id DESC');
   const ingredientes = rows.map((r) => rowToIngrediente(r as Record<string, unknown>));
 
-  // Busca lotes (entradas) de todos os ingredientes de uma vez
   const { rows: movRows } = await db.execute(`
-    SELECT
-      ingrediente_id,
-      id,
-      quantidade,
-      preco_unitario,
-      data        AS data_entrada,
-      observacao,
-      -- validade não existe na movimentacao, busca do ingrediente pai depois
-      NULL AS validade
+    SELECT id, ingrediente_id, quantidade, preco_unitario, data, validade
     FROM movimentacoes_estoque
     WHERE tipo = 'entrada'
     ORDER BY data ASC, id ASC
   `);
 
-  // Agrupa lotes por ingrediente_id
-  const lotesPorId: Record<number, any[]> = {};
+  const lotesPorId: Record<number, object[]> = {};
   for (const row of movRows) {
     const r = row as Record<string, unknown>;
     const ingId = Number(r.ingrediente_id);
     if (!lotesPorId[ingId]) lotesPorId[ingId] = [];
     lotesPorId[ingId].push({
-      id: Number(r.id),
-      quantidade: Number(r.quantidade),
+      id:            Number(r.id),
+      quantidade:    Number(r.quantidade),
       precoUnitario: Number(r.preco_unitario ?? 0),
-      dataEntrada: String(r.data_entrada),
-      validade: null, // preenchido abaixo
+      dataEntrada:   String(r.data),
+      validade:      r.validade ? String(r.validade) : null,
     });
   }
 
-  // Associa lotes a cada ingrediente
   return ingredientes.map((ing) => ({
     ...ing,
     lotes: lotesPorId[ing.id] ?? [],
@@ -156,17 +145,18 @@ export const ingredienteRepository = {
           args: [novaQtd, novaQtd, compra.precoUnitario, validade, id],
         },
         {
-          sql: `INSERT INTO movimentacoes_estoque
-                (ingrediente_id, tipo, quantidade, preco_unitario, observacao, data)
-                VALUES (?, 'entrada', ?, ?, ?, ?)`,
-          args: [
-            id,
-            compra.quantidade,
-            compra.precoUnitario,
-            compra.observacao ?? 'Nova compra',
-            hoje,
-          ],
-        },
+  sql: `INSERT INTO movimentacoes_estoque
+        (ingrediente_id, tipo, quantidade, preco_unitario, observacao, data, validade)
+        VALUES (?, 'entrada', ?, ?, ?, ?, ?)`,
+  args: [
+    id,
+    compra.quantidade,
+    compra.precoUnitario,
+    compra.observacao ?? 'Nova compra',
+    hoje,
+    compra.validade ?? null,
+  ],
+},
       ],
       'write',
     );
