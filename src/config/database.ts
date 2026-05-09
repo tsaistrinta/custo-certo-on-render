@@ -105,3 +105,4 @@ try {
 
 initialized = true;
 console.log('✅ Schema aplicado');
+}
