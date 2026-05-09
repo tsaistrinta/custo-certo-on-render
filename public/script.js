@@ -504,15 +504,63 @@ function popularSelect() {
   if (!sel) return;
   const atual = sel.value;
   sel.innerHTML = '<option value="">— Selecione —</option>';
-  estoque.forEach(item => {
-    const opt = document.createElement('option');
-    opt.value = item.id;
-    opt.textContent = `${item.nome} (${item.unidade})`;
-    sel.appendChild(opt);
-  });
+  // Exclui ingredientes com unidade 'un'
+  estoque
+    .filter(item => item.unidade !== 'un')
+    .forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = `${item.nome} (${item.unidade})`;
+      sel.appendChild(opt);
+    });
   if (atual) sel.value = atual;
   atualizarDisplay();
 }
+
+function abrirInsercaoManual() {
+  const sel = document.getElementById('sel-manual');
+  sel.innerHTML = '<option value="">— Selecione —</option>';
+  // Apenas ingredientes 'un'
+  estoque
+    .filter(item => item.unidade === 'un')
+    .forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.nome;
+      sel.appendChild(opt);
+    });
+  document.getElementById('manual-qtd').value = '';
+  document.getElementById('modal-manual-overlay').classList.add('open');
+  sel.focus();
+}
+window.abrirInsercaoManual = abrirInsercaoManual;
+
+function fecharInsercaoManual() {
+  document.getElementById('modal-manual-overlay').classList.remove('open');
+}
+window.fecharInsercaoManual = fecharInsercaoManual;
+
+async function confirmarInsercaoManual() {
+  const id = parseInt(document.getElementById('sel-manual').value);
+  const qtd = parseFloat(document.getElementById('manual-qtd').value);
+  const ing = estoque.find(i => i.id === id);
+  if (!ing) { showToast('Selecione um ingrediente!', true); return; }
+  if (isNaN(qtd) || qtd <= 0) { showToast('Informe uma quantidade válida!', true); return; }
+  if (qtd > ing.qtd) { showToast('Estoque insuficiente!', true); return; }
+  try {
+    await api(`/ingredientes/${id}/retirada`, {
+      method: 'POST',
+      body: JSON.stringify({ quantidade: qtd }),
+    });
+    showToast(`✓ ${qtd} un de "${ing.nome}" registradas`);
+    fecharInsercaoManual();
+    await carregarDados();
+    popularSelect();
+  } catch (err) {
+    showToast('Erro: ' + err.message, true);
+  }
+}
+window.confirmarInsercaoManual = confirmarInsercaoManual;
 
 function onIngredientChange() { atualizarDisplay(); }
 window.onIngredientChange = onIngredientChange;

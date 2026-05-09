@@ -724,6 +724,9 @@
                             <option value="">— Selecione —</option>
                         </select>
                     </div>
+                    <button class="btn-scale btn-tare" style="background:var(--blue);color:white;border-color:var(--blue)" onclick="abrirInsercaoManual()">
+                        <i class="fas fa-keyboard"></i> Inserção Manual (unidades)
+                    </button>
                     <div class="scale-display">
                         <div class="scale-lbl">Peso na balança</div>
                         <div class="scale-weight" id="peso-display">0.000</div>
@@ -883,6 +886,33 @@
             <button class="btn-cancel" onclick="fecharModalRetirada()">Cancelar</button>
             <button class="btn-save" style="background:var(--orange)" onclick="confirmarRetirada()">
                 <i class="fas fa-minus-circle"></i> Confirmar Retirada
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL INSERÇÃO MANUAL -->
+<div class="modal-overlay" id="modal-manual-overlay">
+    <div class="modal">
+        <div class="modal-title">Inserção Manual — Unidades</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px">
+            <i class="fas fa-info-circle" style="color:var(--blue)"></i>
+            Use para ingredientes contados por unidade (ovos, pães, etc.)
+        </div>
+        <div class="form-grid">
+            <div class="form-group form-full">
+                <label>Ingrediente</label>
+                <select id="sel-manual" class="ingredient-select"></select>
+            </div>
+            <div class="form-group form-full">
+                <label>Quantidade (un)</label>
+                <input type="number" id="manual-qtd" placeholder="0" step="1" min="1">
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="fecharInsercaoManual()">Cancelar</button>
+            <button class="btn-save" style="background:var(--blue)" onclick="confirmarInsercaoManual()">
+                <i class="fas fa-check"></i> Confirmar
             </button>
         </div>
     </div>
